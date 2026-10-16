@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>轉轉好時光・雙輪盤</title>
+<style>
+:root{font-family:system-ui,"Microsoft JhengHei",sans-serif;color:#233746;background:#f5f4ee}*{box-sizing:border-box}body{margin:0}header{padding:24px max(5vw,20px);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #dcded7;gap:20px}h1{font-size:24px;margin:0}small,.muted{color:#64746e}main{max-width:1300px;margin:auto;padding:32px 5vw}h2{font-size:clamp(26px,4vw,42px);margin:8px 0 12px}p{line-height:1.7}button,.file{border:1px solid #cbd4ce;border-radius:12px;padding:12px 20px;background:white;color:#233746;font:inherit;cursor:pointer;display:inline-block}button:hover,.file:hover{background:#e9eee7}button:focus-visible,input:focus-visible{outline:3px solid #db8c2d;outline-offset:3px}.primary{background:#236653;color:white;border-color:#236653}.primary:hover{background:#174a3b}.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:24px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}.card{background:#fff;border:1px solid #dce0d9;border-radius:24px;padding:24px;min-width:0;box-shadow:0 8px 32px #23374606}.card h3{margin:0 0 16px;font-size:24px}label{display:block;font-weight:600;margin-bottom:8px}input[type=text]{width:100%;font:inherit;padding:12px;border:1px solid #cbd4ce;border-radius:10px;color:inherit;background:white}.rows{max-height:360px;overflow:auto;margin:16px 0}.row{display:flex;align-items:center;gap:8px;margin:8px 0}.row span{min-width:24px;color:#64746e}.row button{padding:10px 12px}.count{font-size:14px;color:#64746e}.wheelwrap{position:relative;width:min(100%,440px);margin:24px auto 12px;aspect-ratio:1}.pointer{position:absolute;top:-9px;left:calc(50% - 15px);border-left:15px solid transparent;border-right:15px solid transparent;border-top:32px solid #233746;z-index:2;filter:drop-shadow(0 3px 2px #0003)}canvas{width:100%;height:100%;display:block;filter:drop-shadow(0 8px 10px #0001)}.spin-card{text-align:center}.result{font-size:clamp(26px,3vw,40px);font-weight:800;min-height:1.6em;overflow-wrap:anywhere;color:#236653}.eyebrow{font-size:13px;letter-spacing:2px;color:#64746e}.center{text-align:center}.big{font-size:22px;padding:16px 40px}.hidden{display:none!important}button:disabled{opacity:.45;cursor:wait}#notice{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:14px 22px;background:#233746;color:white;border-radius:12px;z-index:10;max-width:90vw}footer{padding:24px;text-align:center;color:#64746e;font-size:13px}.tag{background:#e2eee6;padding:6px 12px;border-radius:50px;font-size:13px}.history{line-height:1.8;overflow-wrap:anywhere}details{margin-top:24px}summary{cursor:pointer}.titleinput{font-size:20px!important;font-weight:700}.empty{padding:16px;color:#64746e}@media(max-width:700px){.grid{grid-template-columns:1fr}header{padding:18px;flex-wrap:wrap}main{padding:24px 16px}.card{padding:18px}.toolbar button,.file{flex-grow:1;text-align:center}h1{font-size:20px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+.es{display:block;font-size:.82em;font-weight:400;line-height:1.45;letter-spacing:normal;margin-top:4px;opacity:.88}.result .es{font-size:.52em}.eyebrow .es{font-size:12px}.bilingual{white-space:normal}#notice{max-height:50vh;overflow:auto}.input-translation{margin:4px 0 10px;color:#64746e;font-size:14px}</style></head><body>
+<header><div><h1>◉ 轉轉好時光</h1><small>兩個輪盤，轉出更多可能</small></div><span id="saveStatus" class="tag" role="status">設定自動保存</span></header>
+<main><section id="settings"><div class="eyebrow">STEP 01 · 準備你的輪盤</div><h2>今天，轉出什麼驚喜？</h2><p class="muted">填入學生姓名、課堂題目或活動。兩個輪盤可分別設定，每個項目抽中的機會相同。</p><div class="toolbar"><button id="export">↓ 匯出 JSON</button><label class="file" style="margin:0;font-weight:400">↑ 匯入 JSON<input id="import" type="file" accept=".json,application/json" hidden></label><span class="muted">資料保存在目前瀏覽器；匯出可備份或換裝置。</span></div><div id="editors" class="grid"></div><div class="toolbar"><button id="start" class="primary big">開始雙輪盤 →</button></div><details><summary>使用小提醒</summary><p>每個輪盤可設定 1–100 個項目，每項最多 80 個字，名稱最多 30 個字。空白項目不參與抽選；重複文字會視為不同項目。項目較多時，輪盤只顯示編號，抽選結果仍會完整顯示。</p><p>匯入會取代目前設定。離線檔案的瀏覽器保存行為可能因環境而異，建議課前匯出備份；無痕模式或清除瀏覽器資料可能移除設定。</p></details></section>
+<section id="play" class="hidden"><div class="toolbar" style="margin-top:0"><button id="back">← 返回設定</button><button id="fullscreen">⛶ 全螢幕投影</button><span class="muted">可分別抽選，也可同時轉動。</span></div><div class="grid" id="wheels"></div><div class="center toolbar" style="justify-content:center"><button id="both" class="primary big">✦ 兩個一起轉</button></div><div class="card"><h3>本次抽選紀錄</h3><div id="history" class="history muted">還沒有抽選紀錄，轉動輪盤開始吧！</div><button id="clear" style="margin-top:12px">清除紀錄</button></div></section></main><footer>轉轉好時光 · 教室裡的每一個可能，都值得期待。</footer><div id="notice" role="status" class="hidden"></div>
+<script>
+'use strict';
+const KEY='double-wheel-settings-v1',colors=['#236653','#db9851','#467e9b','#b46b74','#7b789e','#6c8c50','#b47d42','#488c87'];
+const initial={version:1,wheels:[{title:'今天誰來挑戰？',items:['小安','小晴','小宇','小樂','小恩','小涵']},{title:'來個小任務',items:['造一個句子','分享一件開心的事','問同學一個問題','用動作表演','說出三個詞語','大聲朗讀']}]};
+function validate(data){if(!data||data.version!==1||!Array.isArray(data.wheels)||data.wheels.length!==2)throw Error('格式不符：需要 version: 1 與兩個 wheels。');return{version:1,wheels:data.wheels.map(w=>{if(!w||typeof w.title!=='string'||w.title.length>30||!Array.isArray(w.items)||w.items.length>100||w.items.some(x=>typeof x!=='string'||x.length>80))throw Error('設定超出限制或項目格式不正確。');return{title:w.title,items:[...w.items]}})}}
+let config=structuredClone(initial),storageOK=true;try{const raw=localStorage.getItem(KEY);if(raw)config=validate(JSON.parse(raw));}catch(e){storageOK=false;document.querySelector('#saveStatus').textContent='保存資料無法讀取，請匯出備份';}
+const $=s=>document.querySelector(s);let timer;function notice(msg){$('#notice').textContent=msg;$('#notice').classList.remove('hidden');clearTimeout(timer);timer=setTimeout(()=>$('#notice').classList.add('hidden'),4500)}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(config));storageOK=true;$('#saveStatus').textContent='✓ 已自動保存';}catch(e){storageOK=false;$('#saveStatus').textContent='無法自動保存，請匯出備份';}}
+function el(tag,txt,cls){const n=document.createElement(tag);if(txt!==undefined)n.textContent=txt;if(cls)n.className=cls;return n}
+function renderEditors(){const host=$('#editors');host.replaceChildren();config.wheels.forEach((w,i)=>{const card=el('article',undefined,'card');card.append(el('div',`輪盤 ${i+1}`,'eyebrow'));const label=el('label','輪盤名稱');label.htmlFor='title'+i;const title=el('input');title.type='text';title.id='title'+i;title.className='titleinput';title.maxLength=30;title.value=w.title;title.oninput=()=>{w.title=title.value;save()};card.append(label,title);const rows=el('div',undefined,'rows');w.items.forEach((item,j)=>{const row=el('div',undefined,'row'),input=el('input'),del=el('button','×');input.type='text';input.maxLength=80;input.value=item;input.setAttribute('aria-label',`輪盤 ${i+1}，項目 ${j+1}`);input.oninput=()=>{w.items[j]=input.value;save()};del.setAttribute('aria-label',`刪除輪盤 ${i+1} 的第 ${j+1} 項`);del.onclick=()=>{w.items.splice(j,1);save();renderEditors()};row.append(el('span',String(j+1)),input,del);rows.append(row)});const add=el('button','＋ 新增項目');add.disabled=w.items.length>=100;add.onclick=()=>{w.items.push('');save();renderEditors();const inputs=$('#editors').children[i].querySelectorAll('.row input');inputs[inputs.length-1].focus()};card.append(rows,add,el('p',`${w.items.length} / 100 個項目 · 空白不參與抽選`,'count'));host.append(card)})}
+$('#export').onclick=()=>{const blob=new Blob([JSON.stringify(config,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=el('a');a.href=url;a.download='雙輪盤設定.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);notice('設定已匯出，請保留 JSON 檔作為備份。')};
+$('#import').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{if(file.size>200000)throw Error('檔案過大，請選擇小於 200 KB 的設定檔。');const next=validate(JSON.parse(await file.text()));if(!confirm('匯入將取代目前兩個輪盤的設定，是否繼續？\nLa importación reemplazará la configuración de ambas ruletas. ¿Deseas continuar?'))return;config=next;save();renderEditors();notice('已匯入兩個輪盤設定。')}catch(err){notice('匯入失敗：'+err.message)}finally{e.target.value=''}};
+let active=[],angles=[0,0],busy=[false,false],results=['',''],history=[];
+function pick(n){const range=4294967296,limit=range-range%n;let a=new Uint32Array(1);do{crypto.getRandomValues(a)}while(a[0]>=limit);return a[0]%n}
+function draw(i){const canvas=$('#canvas'+i),ctx=canvas.getContext('2d'),items=active[i].items,n=items.length,c=440,r=420;ctx.clearRect(0,0,880,880);ctx.save();ctx.translate(c,c);ctx.rotate(angles[i]);for(let j=0;j<n;j++){let a=-Math.PI/2+j*2*Math.PI/n,b=a+2*Math.PI/n;ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,r,a,b);ctx.closePath();ctx.fillStyle=colors[j%colors.length];ctx.fill();ctx.strokeStyle='#fff9';ctx.lineWidth=2;ctx.stroke();ctx.save();ctx.rotate((a+b)/2);ctx.textAlign='right';ctx.fillStyle='#fff';ctx.font=`bold ${n>30?16:n>16?22:30}px system-ui`;const name=n>16?String(j+1):(items[j].length>9?items[j].slice(0,8)+'…':items[j]);ctx.fillText(name,r-25,10);ctx.restore()}ctx.beginPath();ctx.arc(0,0,57,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();ctx.fillStyle='#233746';ctx.textAlign='center';ctx.font='bold 30px system-ui';ctx.fillText('轉',0,0);ctx.font='16px system-ui';ctx.fillText('Girar',0,26);ctx.restore()}
+function updateButtons(){for(let i=0;i<2;i++)$('#spin'+i).disabled=busy[i];$('#both').disabled=busy.some(Boolean);$('#back').disabled=busy.some(Boolean)}
+function spin(i){if(busy[i])return;busy[i]=true;updateButtons();const chosen=pick(active[i].items.length),tau=Math.PI*2,step=tau/active[i].items.length,target=((-(chosen+.5)*step)%tau+tau)%tau,start=angles[i],delta=((target-start%tau)+tau)%tau,end=start+tau*6+delta,duration=matchMedia('(prefers-reduced-motion: reduce)').matches?100:3600+Math.random()*500,t0=performance.now();$('#result'+i).textContent='抽選中…';function frame(now){const t=Math.min(1,(now-t0)/duration);angles[i]=start+(end-start)*(1-Math.pow(1-t,4));draw(i);if(t<1)requestAnimationFrame(frame);else{angles[i]=((end%tau)+tau)%tau;results[i]=active[i].items[chosen];$('#result'+i).textContent=results[i];busy[i]=false;history.unshift(`${active[i].title}：${results[i]}`);history=history.slice(0,20);renderHistory();updateButtons()}}requestAnimationFrame(frame)}
+function renderHistory(){const host=$('#history');host.replaceChildren();if(!history.length)host.textContent='還沒有抽選紀錄，轉動輪盤開始吧！';else history.forEach((x,j)=>host.append(el('div',`${j+1}. ${x}`)))}
+$('#start').onclick=()=>{active=config.wheels.map((w,i)=>({title:w.title.trim()||`輪盤 ${i+1}`,items:w.items.map(x=>x.trim()).filter(Boolean)}));if(active.some(w=>!w.items.length)){notice('請在兩個輪盤各填入至少一個非空白項目。');return}angles=[0,0];results=['',''];$('#wheels').replaceChildren();active.forEach((w,i)=>{const card=el('article',undefined,'card spin-card');card.append(el('div',`輪盤 ${i+1}`,'eyebrow'),el('h3',w.title));const wrap=el('div',undefined,'wheelwrap'),canvas=el('canvas');canvas.id='canvas'+i;canvas.width=880;canvas.height=880;canvas.setAttribute('role','img');canvas.setAttribute('aria-label',w.title+'：'+w.items.join('、'));wrap.append(el('div',undefined,'pointer'),canvas);const result=el('div','準備好了！','result');result.id='result'+i;result.setAttribute('aria-live','polite');const btn=el('button','轉動這個輪盤','primary');btn.id='spin'+i;btn.onclick=()=>spin(i);card.append(wrap,result,btn);if(w.items.length>16)card.append(el('p','輪盤以項目編號呈現，抽選後顯示完整文字。','muted'));$('#wheels').append(card);draw(i)});$('#settings').classList.add('hidden');$('#play').classList.remove('hidden');window.scrollTo(0,0)};
+$('#both').onclick=()=>{if(!busy.some(Boolean)){spin(0);spin(1)}};$('#back').onclick=()=>{if(busy.some(Boolean))return;$('#play').classList.add('hidden');$('#settings').classList.remove('hidden')};$('#clear').onclick=()=>{history=[];renderHistory()};$('#fullscreen').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen()}catch(e){notice('此瀏覽器不支援全螢幕，請使用瀏覽器的全螢幕功能。')}};renderEditors();
+
+// Interface translations are displayed beneath Chinese; saved user data stays unchanged.
+const spanish={
+  "◉ 轉轉好時光": "◉ Hora de girar",
+  "兩個輪盤，轉出更多可能": "Dos ruletas, más posibilidades",
+  "設定自動保存": "La configuración se guarda automáticamente",
+  "✓ 已自動保存": "✓ Guardado automáticamente",
+  "保存資料無法讀取，請匯出備份": "No se pudieron leer los datos guardados. Exporta una copia de seguridad.",
+  "無法自動保存，請匯出備份": "No se puede guardar automáticamente. Exporta una copia de seguridad.",
+  "STEP 01 · 準備你的輪盤": "PASO 01 · Prepara tus ruletas",
+  "今天，轉出什麼驚喜？": "¿Qué sorpresa nos espera hoy?",
+  "填入學生姓名、課堂題目或活動。兩個輪盤可分別設定，每個項目抽中的機會相同。": "Escribe nombres, preguntas o actividades. Configura cada ruleta por separado; todas las opciones tienen la misma probabilidad de salir.",
+  "↓ 匯出 JSON": "↓ Exportar JSON",
+  "↑ 匯入 JSON": "↑ Importar JSON",
+  "資料保存在目前瀏覽器；匯出可備份或換裝置。": "Los datos se guardan en este navegador. Expórtalos para crear una copia o cambiar de dispositivo.",
+  "開始雙輪盤 →": "Ir a las ruletas →",
+  "使用小提醒": "Consejos de uso",
+  "每個輪盤可設定 1–100 個項目，每項最多 80 個字，名稱最多 30 個字。空白項目不參與抽選；重複文字會視為不同項目。項目較多時，輪盤只顯示編號，抽選結果仍會完整顯示。": "Cada ruleta admite entre 1 y 100 opciones, de hasta 80 caracteres cada una, y un título de hasta 30 caracteres. Las opciones vacías no participan; los textos repetidos cuentan como opciones distintas. Si hay muchas opciones, la ruleta muestra números y el resultado muestra el texto completo.",
+  "匯入會取代目前設定。離線檔案的瀏覽器保存行為可能因環境而異，建議課前匯出備份；無痕模式或清除瀏覽器資料可能移除設定。": "La importación reemplaza la configuración actual. El guardado de archivos sin conexión puede variar según el navegador. Exporta una copia antes de la clase; el modo privado o borrar los datos del navegador puede eliminar la configuración.",
+  "← 返回設定": "← Volver a la configuración",
+  "⛶ 全螢幕投影": "⛶ Pantalla completa",
+  "可分別抽選，也可同時轉動。": "Gira cada ruleta por separado o las dos a la vez.",
+  "✦ 兩個一起轉": "✦ Girar ambas ruletas",
+  "本次抽選紀錄": "Historial de esta sesión",
+  "還沒有抽選紀錄，轉動輪盤開始吧！": "Todavía no hay resultados. ¡Gira una ruleta para empezar!",
+  "清除紀錄": "Borrar historial",
+  "轉轉好時光 · 教室裡的每一個可能，都值得期待。": "Hora de girar · Cada posibilidad en el aula merece su momento.",
+  "輪盤名稱": "Nombre de la ruleta",
+  "＋ 新增項目": "＋ Añadir opción",
+  "設定已匯出，請保留 JSON 檔作為備份。": "Configuración exportada. Conserva el archivo JSON como copia de seguridad.",
+  "已匯入兩個輪盤設定。": "Se ha importado la configuración de ambas ruletas.",
+  "格式不符：需要 version: 1 與兩個 wheels。": "Formato incorrecto: se requiere version: 1 y dos elementos en wheels.",
+  "設定超出限制或項目格式不正確。": "La configuración supera los límites o las opciones tienen un formato incorrecto.",
+  "檔案過大，請選擇小於 200 KB 的設定檔。": "El archivo es demasiado grande. Elige uno de menos de 200 KB.",
+  "請在兩個輪盤各填入至少一個非空白項目。": "Introduce al menos una opción no vacía en cada ruleta.",
+  "抽選中…": "Girando…",
+  "準備好了！": "¡Todo listo!",
+  "轉動這個輪盤": "Girar esta ruleta",
+  "輪盤以項目編號呈現，抽選後顯示完整文字。": "La ruleta muestra números de opción; el resultado muestra el texto completo.",
+  "此瀏覽器不支援全螢幕，請使用瀏覽器的全螢幕功能。": "No se pudo activar la pantalla completa. Usa la función de pantalla completa de tu navegador.",
+  "今天誰來挑戰？": "¿Quién acepta el reto hoy?",
+  "來個小任務": "Un pequeño reto",
+  "造一個句子": "Forma una oración",
+  "分享一件開心的事": "Comparte algo que te haya alegrado",
+  "問同學一個問題": "Hazle una pregunta a un compañero",
+  "用動作表演": "Represéntalo con gestos",
+  "說出三個詞語": "Di tres palabras",
+  "大聲朗讀": "Lee en voz alta",
+  "小安": "Xiao An",
+  "小晴": "Xiao Qing",
+  "小宇": "Xiao Yu",
+  "小樂": "Xiao Le",
+  "小恩": "Xiao En",
+  "小涵": "Xiao Han"
+};
+function spanishFor(text){
+ if(spanish[text])return spanish[text];
+ let m=text.match(/^輪盤 (\d+)$/);if(m)return 'Ruleta '+m[1];
+ m=text.match(/^(\d+) \/ 100 個項目 · 空白不參與抽選$/);if(m)return m[1]+' / 100 opciones · Las opciones vacías no participan';
+ if(text.startsWith('匯入失敗：')){const detail=text.slice(5);return 'Error al importar: '+(spanish[detail]||'El archivo no contiene un JSON válido.');}
+ m=text.match(/^(\d+\. )?(.+?)：(.+)$/);if(m){const a=spanishFor(m[2]),b=spanishFor(m[3]);if(a||b)return (m[1]||'')+(a||m[2])+': '+(b||m[3]);}
+ return '';
+}
+function addSpanish(root){
+ if(root.nodeType===3){const parent=root.parentElement;if(!parent||parent.closest('script,style,.bilingual,.es,textarea,option'))return;const text=root.textContent.trim(),translation=spanishFor(text);if(!translation)return;const wrap=document.createElement('span');wrap.className='bilingual';const zh=document.createElement('span');zh.lang='zh-Hant';zh.textContent=root.textContent;const es=document.createElement('span');es.className='es';es.lang='es';es.textContent=translation;wrap.append(zh,es);root.replaceWith(wrap);return;}
+ if(root.nodeType!==1||root.matches('script,style,.bilingual,.es'))return;
+ Array.from(root.childNodes).forEach(addSpanish);
+}
+function updateInputTranslations(){
+ document.querySelectorAll('#editors input[type=text]').forEach(input=>{let help=input.nextElementSibling;if(!help||!help.classList.contains('input-translation')){help=document.createElement('span');help.className='input-translation';help.lang='es';if(input.closest('.row')){const cell=document.createElement('div');cell.style.cssText='flex:1;min-width:0';input.before(cell);cell.append(input,help);}else input.after(help);}const translated=spanishFor(input.value.trim());if(help.textContent!==translated)help.textContent=translated;help.hidden=!translated;});
+}
+addSpanish(document.body);updateInputTranslations();
+const bilingualObserver=new MutationObserver(records=>{for(const record of records){if(record.type==='characterData')addSpanish(record.target);else record.addedNodes.forEach(addSpanish);}updateInputTranslations();});
+bilingualObserver.observe(document.body,{childList:true,subtree:true,characterData:true});
+document.querySelector('#editors').addEventListener('input',updateInputTranslations);
+
+</script></body></html>
